@@ -50,6 +50,7 @@ class LoginController extends Controller
 
         $custommessages = [
             'email.required' => 'Email is required',
+            'email.exists' => 'User Email Not Exists',
             'password.required' => 'Password is required',
         ];
 

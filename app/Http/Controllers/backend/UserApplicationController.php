@@ -187,15 +187,11 @@ class UserApplicationController extends Controller
     {
         // dd($array);
         $users = [];
-        for ($i = 0; $i < count($array); $i++) {
+        $groups = Group::find($array);
+        for ($i=0; $i <count($groups) ; $i++) { 
             # code...
-            // dd($array[$i]);
-            $users1 = Group::find($array[$i]);
-            $users2 = json_decode($users1->userids);
-            for ($j = 0; $j < count($users2); $j++) {
-                # code...
-                array_push($users, $users2[$j]);
-            }
+            array_push($users, $groups[$i]->groupusers()->pluck('userids'));
+            
         }
         // dd($users);
         return array_unique($users);

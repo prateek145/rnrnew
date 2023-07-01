@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('access')->nullable();
+            $table->string('layout')->nullable();
             $table->integer('status')->nullable();
             $table->integer('applicationid')->nullable();
             $table->string('type')->nullable();
