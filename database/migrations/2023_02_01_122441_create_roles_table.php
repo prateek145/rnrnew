@@ -17,9 +17,9 @@ return new class extends Migration {
             $table->string('name')->nullable();
             $table->integer('status')->nullable();
             $table->longText('description')->nullable();
-            $table->integer('application_id')->nullable();
-            $table->longText('userids')->default(0);
-            $table->longText('groupids')->default(0);
+            // $table->integer('application_id')->nullable();
+            // $table->longText('userids')->default(0);
+            // $table->longText('groupids')->default(0);
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
             $table->timestamps();

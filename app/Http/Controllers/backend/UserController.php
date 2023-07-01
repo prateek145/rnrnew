@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\backend\Group;
+use App\Models\backend\Userrole;
+use App\Models\backend\Usergroup;
 use App\Models\backend\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Models\backend\Groupuserids;
 
 class UserController extends Controller
 {
@@ -19,11 +22,11 @@ class UserController extends Controller
      */
     public function index()
     {
+        //code...
+        $users = User::where('role', '!=' ,'admin')->latest()->get();
+        // dd($users);
+        return view('backend.users.index', compact('users'));
         try {
-            //code...
-            $users = User::latest()->get();
-            // dd($users);
-            return view('backend.users.index', compact('users'));
         } catch (\Exception $th) {
             //throw $th;
             return redirect()
@@ -62,12 +65,16 @@ class UserController extends Controller
                 'mobile_no' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
                 'password' => 'required|min:6',
                 'repassword' => 'required',
+                'groupids' => 'required',
+                'roleids' => 'required',
             ];
 
             $custommessages = [
                 'email.unique' => 'Email Already Exists',
                 'email.required' => 'Email Required',
                 'mobile_no.regex' => 'Please Check Mobile Number',
+                'groupids.required' => 'Group Id id Required',
+                'roleids.required' => 'Role Id id Required',
             ];
 
             $this->validate($request, $rules, $custommessages);
@@ -79,23 +86,57 @@ class UserController extends Controller
                 unset($data['_token']);
                 unset($data['password']);
                 unset($data['repassword']);
+                unset($data['groupids']);
+                unset($data['roleids']);
                 // dd($data);
-                if ($request->groupids) {
-                    # code...
-                    unset($data['groupids']);
-                    $data['groupids'] = json_encode($request->groupids);
-                }
-
-                if ($request->roleids) {
-                    # code...
-                    unset($data['roleids']);
-                    $data['roleids'] = json_encode($request->roleids);
-                }
 
                 $currentarray = json_encode($data);
                 $data['password'] = Hash::make($request->password);
                 // dd($data);
                 $user = User::create($data);
+                if ($request->groupids) {
+                    # code...
+                    for ($i = 0; $i < count($request->groupids); $i++) {
+                        $userroup = new Usergroup();
+                        $userroup->userid = $user->id;
+                        $userroup->groupids = $request->groupids[$i];
+                        $userroup->created_by = auth()->id();
+                        $userroup->save();
+                    }
+
+                    $groups = Group::find($request->groupids);
+
+                    for ($i = 0; $i < count($groups); $i++) {
+                        # code...
+                        $existedgroupusers = $groups[$i]
+                            ->groupusers()
+                            ->pluck('userids')
+                            ->toArray();
+                        if (in_array($user->id, $existedgroupusers)) {
+                            # code...
+                        } else {
+                            # code...
+                            $groupuser = new Groupuserids();
+                            $groupuser->groupid = $groups[$i]->id;
+                            $groupuser->userids = $user->id;
+                            $groupuser->created_by = auth()->id();
+                            $groupuser->save();
+                        }
+                    }
+                }
+
+                if ($request->roleids) {
+                    # code...
+                    for ($i = 0; $i < count($request->roleids); $i++) {
+                        $userroup = new Userrole();
+                        // dd($usergroup);
+                        $userroup->userid = $user->id;
+                        $userroup->roleids = $request->roleids[$i];
+                        $userroup->created_by = auth()->id();
+                        $userroup->save();
+                    }
+                }
+
                 Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , User Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' User Name -> ' . $user->name . ' Data -> ' . $currentarray);
 
                 return redirect()
@@ -137,10 +178,20 @@ class UserController extends Controller
         $user = User::find($id);
         $groups = Group::Orderby('id', 'DESC')->get();
         $roles = Role::Orderby('id', 'DESC')->get();
-        $usergroups = Group::find(json_decode($user->groupids));
-        $userroles = Role::find(json_decode($user->roleids));
+        // $usergroupsids = $user
+        //     ->usergroups()
+        //     ->pluck('groupids')
+        //     ->toArray();
+        $usergroupsids = $user->selectedthroughgroup()->pluck('groupid')->toArray();
+        // dd($usergroupsids, $selectedthroughgroup);
+        $userrolesids = $user
+            ->userroles()
+            ->pluck('roleids')
+            ->toArray();
+        $selectedgroups = Group::find($usergroupsids);
+        $selectedroles = Role::find($userrolesids);
         // dd($user->groupids);
-        return view('backend.users.edit', compact('user', 'groups', 'roles', 'usergroups', 'userroles'));
+        return view('backend.users.edit', compact('user', 'groups', 'roles', 'usergroupsids', 'userrolesids', 'selectedgroups', 'selectedroles'));
     }
 
     /**
@@ -171,12 +222,15 @@ class UserController extends Controller
             $this->validate($request, $rules, $custommessages);
 
             // dd($request->all());
+            $user = User::find($id);
             if ($request->password == $request->repassword) {
                 # code...
                 $data = $request->all();
                 unset($data['_token']);
                 unset($data['password']);
                 unset($data['password_confirmation']);
+                unset($data['groupids']);
+                unset($data['roleids']);
 
                 if (isset($request->password)) {
                     # code...
@@ -187,23 +241,60 @@ class UserController extends Controller
                     # code...
                 }
 
-                // dd($data);
                 if ($request->groupids) {
                     # code...
-                    unset($data['groupids']);
-                    $data['groupids'] = json_encode($request->groupids);
-                }
+                    $usergroupids = $user->usergroups()->pluck('id');
+                    Usergroup::destroy($usergroupids);
+                    for ($i = 0; $i < count($request->groupids); $i++) {
+                        $userroup = new Usergroup();
+                        $userroup->userid = $user->id;
+                        $userroup->groupids = $request->groupids[$i];
+                        $userroup->created_by = auth()->id();
+                        $userroup->save();
+                    }
 
+                    $groups = Group::find($request->groupids);
+                 
+                    for ($i = 0; $i < count($groups); $i++) {
+                        # code...
+                        $existedgroupusers = $groups[$i]
+                            ->groupusers()
+                            ->pluck('userids')
+                            ->toArray();
+                        if (in_array($user->id, $existedgroupusers)) {
+                            # code...
+                        } else {
+                            # code...
+                            $groupuser = new Groupuserids();
+                            // dd($existedgroupusers, $groups[$i], $user->id);
+                            $groupuser->groupid = $groups[$i]->id;
+                            $groupuser->userids = $user->id;
+                            $groupuser->created_by = auth()->id();
+                            $groupuser->save();
+                        }
+                    }
+                }
+              
+      
                 if ($request->roleids) {
                     # code...
-                    unset($data['roleids']);
-                    $data['roleids'] = json_encode($request->roleids);
+                    $userroleids = $user->userroles()->pluck('id');
+                    Userrole::destroy($userroleids);
+                    // dd($request->roleids);
+                    for ($i = 0; $i < count($request->roleids); $i++) {
+                        $userroup = new Userrole();
+                        // dd($usergroup);
+                        $userroup->userid = $user->id;
+                        $userroup->roleids = $request->roleids[$i];
+                        $userroup->created_by = auth()->id();
+                        $userroup->save();
+                    }
                 }
-
+     
                 $currentarray = json_encode($data);
-               
+
                 // dd($data);
-                $user = User::find($id);
+
                 $user->update($data);
                 Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , User Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' User Name -> ' . $user->name . ' Data -> ' . $currentarray);
 

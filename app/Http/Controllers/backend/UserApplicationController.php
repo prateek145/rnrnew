@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\backend\Application;
 use App\Models\backend\Field;
 use App\Models\backend\Formdata;
+use App\Models\backend\Fielduserid;
 use App\Models\User;
+use App\Models\backend\Fieldgroupid;
 use App\Models\backend\Group;
 use App\Models\backend\ApplicationIndexing;
 use the42coders\Workflows\Workflow;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use the42coders\Workflows\Tasks\Task;
 use Illuminate\Support\Facades\Mail;
 use App\Traits\WorkflowTraits;
+use App\Models\backend\Application_roles;
 
 class UserApplicationController extends Controller
 {
@@ -119,56 +122,24 @@ class UserApplicationController extends Controller
         try {
             //code...
             $application = Application::find($id);
-            $users = User::latest()->get();
-            $groups = Group::latest()->get();
-            $dbfields = Field::where(['application_id' => $application->id, 'status' => 1])
+            $authuser = auth()->user();
+            $totalfields = Field::where(['application_id' => $application->id, 'status' => 1])
                 ->orderBy('forder', 'ASC')
                 ->get();
 
-            //here on saturday code here find private access group view
-            // dd($dbfields);
-            // $fields = [];
-            $fields = [];
-            $userid = [];
-            for ($i = 0; $i < count($dbfields); $i++) {
-                # code...
+            $fieldids = $this->returnuser($id, $totalfields);
+            $fields = Field::find($fieldids);
+            $users = User::where('status', 1)->get();
+            $groups = Group::where('status', 1)->get();
+            // $roles = Application_roles::where('applicationid', $id)->first();
 
-                if ($dbfields[$i]->access == 'private') {
-                    # code...
-                    if ($dbfields[$i]->groups != 'null') {
-                        array_push($userid, $this->findusers($dbfields[$i]->groups));
-                        // if ($dbfields[$i]->rolestable()->first()->group_list != 'null') {
-                        //     # code...
-                        // }
-
-                        // if ($dbfields[$i]->rolestable()->first()->user_list != 'null') {
-                        //     # code...
-                        //     array_push($userid, json_decode($dbfields[$i]->rolestable()->first()->user_list));
-                        // }
-
-                        $useridfound = 'false';
-                        // dd(in_array(auth()->id(), $userid[2]));
-                        for ($j = 0; $j < count($userid); $j++) {
-                            if (in_array(auth()->id(), $userid[$j])) {
-                                $useridfound = 'true';
-                            }
-                        }
-
-                        if ($useridfound == 'true') {
-                            array_push($fields, $dbfields[$i]);
-                        }
-                        // dd($fields);
-                    }
-                } else {
-                    # code...
-                    array_push($fields, $dbfields[$i]);
-                }
-            }
-
-            // dd($fields);
-
+            // // dd($roles);
+            // if ($roles->create != 1) {
+            //     # code...
+            //     throw new \Exception('Admin change your functionality');
+            // }
+            // dd($groups, $users, $fields);
             return view('backend.userapplication.edit', compact('groups', 'id', 'users', 'application', 'fields'));
-            // dd($application);
         } catch (\Exception $th) {
             //throw $th;
             return redirect()
@@ -177,135 +148,208 @@ class UserApplicationController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function returnuser($applicationid, $fields)
+    {
+        // dd($applicationid, $fields);
+        $fields1 = [];
+        for ($i = 0; $i < count($fields); $i++) {
+            # code...
+            if ($fields[$i]->access == 'private') {
+                # code...
+                $fielduserid = Fielduserid::where('fieldid', $fields[$i]->id)
+                    ->pluck('userids')
+                    ->toArray();
+                $fieldgroupid = Fieldgroupid::where('fieldid', $fields[$i]->id)
+                    ->pluck('groupids')
+                    ->toArray();
+                $fieldgroupusers = $this->findgroupusers($fieldgroupid);
+                if ($fielduserid != []) {
+                    if (in_array(auth()->id(), $fielduserid, true)) {
+                        # code...
+                        array_push($fields1, $fields[$i]->id);
+                    }
+                }
+
+                if ($fieldgroupusers != []) {
+                    if (in_array(auth()->id(), $fieldgroupusers, true)) {
+                        # code...
+                        array_push($fields1, $fields[$i]->id);
+                    }
+                }
+            } else {
+                array_push($fields1, $fields[$i]->id);
+            }
+        }
+        return array_unique($fields1);
+    }
+
+    public function findgroupusers($array)
+    {
+        // dd($array);
+        $users = [];
+        for ($i = 0; $i < count($array); $i++) {
+            # code...
+            // dd($array[$i]);
+            $users1 = Group::find($array[$i]);
+            $users2 = json_decode($users1->userids);
+            for ($j = 0; $j < count($users2); $j++) {
+                # code...
+                array_push($users, $users2[$j]);
+            }
+        }
+        // dd($users);
+        return array_unique($users);
+    }
+
     public function update(Request $request, $id)
     {
-        //code...
-        $data = $request->all();
-        unset($data['_token']);
-        unset($data['_method']);
-        unset($data['userid']);
-        unset($data['formdataid']);
-        // dd($data);
-        foreach (request()->allFiles() as $key => $value) {
-            if ($value->getSize() > 2e6) {
+        try {
+            //code...
+            // dd($request->all());
+            $data12 = $request->all();
+
+            $data = [];;
+            foreach ($data12 as $key => $value) {
+                if (str_contains($key, '_')) {
+                    # code...
+                    $key1 = str_replace('_', ' ', $key);
+                    $data[$key1] = $value;
+                } else {
+                    $data[$key] = $value;
+                }
+            }
+            unset($data['_token']);
+            unset($data['_method']);
+            unset($data['userid']);
+            unset($data['formdataid']);
+            // dd($data);
+
+            foreach (request()->allFiles() as $key => $value) {
+                if ($value->getSize() > 2e6) {
+                    # code...
+                    throw new Exception('File Size is more then 2 mb');
+                } else {
+                    # code...
+                    unset($data[$key]);
+                    $filename = rand() . $value->getClientOriginalName();
+                    $value->move(public_path('files'), $filename);
+                    $data[$key] = $filename;
+                }
+            }
+            // dd($data);
+            $application = Application::find($id);
+            $roles = Application_roles::where('applicationid', $id)->first();
+
+            if (isset($request->formdataid)) {
                 # code...
-                throw new Exception('File Size is more then 2 mb');
+                // dd($roles);
+                if ($roles->update != 1) {
+                    # code...
+                    throw new \Exception('Admin change your functionality');
+                }
+
+                $data1['data'] = json_encode($data);
+                $data1['userid'] = $request->userid;
+                $data1['application_id'] = $id;
+                // dd($data1);
+                $formdata = Formdata::find($request->formdataid);
+                $currentarray = $formdata->data;
+                $changearray = $data1['data'];
+                $formdata->update($data1);
+                Log::channel('user')->info('Userid -> ' . auth()->user()->custom_userid . ' , Application Edited by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Application Name -> ' . $application->name . ' Current Data -> ' . $currentarray . ' Change Data -> ' . $changearray);
+
+                return redirect()
+                    ->back()
+                    ->with('success', 'Form Updated.');
             } else {
                 # code...
-                unset($data[$key]);
-                $filename = rand() . $value->getClientOriginalName();
-                $value->move(public_path('files'), $filename);
-                $data[$key] = $filename;
+                // dd($roles);
+                if ($roles->create != 1) {
+                    # code...
+                    throw new \Exception('Admin change your functionality');
+                }
+                $data1['data'] = json_encode($data);
+                $data1['userid'] = $request->userid;
+                $data1['application_id'] = $id;
+                // dd($data);
+                //workflow functionality
+                // $workflow = Workflow::where('application_id', $id)->first();
+                // $tasks = Task::where('workflow_id', $workflow->id)
+                //     ->latest()
+                //     ->get();
+                // dd($workflow, $tasks);
+                // $this->workflow($tasks);
+                // for ($i = 0; $i < count($tasks); $i++) {
+                //     # code...
+                //     if ($tasks[$i]->name == 'SendNotification') {
+                //         # code...
+                //         $sendmail = false;
+                //         $wdata = json_decode($tasks[$i]->data_fields);
+                //         // dd($data);
+                //         $subject = $wdata->name;
+                //         $notification = $wdata->notification;
+
+                //     }
+
+                //     $parenttask = Task::where('id', $tasks[$i]->parentable_id)->first();
+                //     // // dd($parenttask);
+                //     // if (isset($parenttask->name) && $parenttask->name == 'EvaluateContent') {
+                //     //     $wdata1 = json_decode($parenttask->data_fields);
+                //     //     // dd($wdata1);
+                //     //     for ($j = 0; $j < count($wdata1->fieldname); $j++) {
+                //     //         # code...
+                //     //         if (array_key_exists($wdata1->fieldname[$j], $data)) {
+                //     //             # code...
+                //     //             // dd($wdata1->fieldname[$j], $data);
+                //     //             if ($wdata1->operators[$j] == 'equal') {
+                //     //                 # code...
+                //     //                 if ($data[$wdata1->fieldname[$j]] == $wdata1->values[$j]) {
+
+                //     //                     # code...
+                //     //                     // dd($notification);
+                //     //                     $mailsend = Mail::send('email.useraction', ['data' => $notification], function ($message) use($notification, $subject) {
+                //     //                         $message->sender('jakpower@omegawebdemo.com.au');
+                //     //                         $message->subject($subject);
+                //     //                         $message->to(auth()->user()->email);
+                //     //                     });
+                //     //                 }
+                //     //             }
+                //     //         }
+                //     //     }
+                //     // }
+                // }
+                Log::channel('user')->info('Application Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Application Name -> ' . $application->name . ' Current Data -> ' . $data1['data']);
+                // dd('Demo purpose only ask if condition match form create or not.');
+
+                Formdata::create($data1);
+                return redirect()
+                    ->route('userapplication.list', $id)
+                    ->with('success', 'Form Saved.');
             }
-        }
-        // dd($data);
-        $application = Application::find($id);
-
-        if (isset($request->formdataid)) {
-            # code...
-            $data1['data'] = json_encode($data);
-            $data1['userid'] = $request->userid;
-            $data1['application_id'] = $id;
-            // dd($data1);
-            $formdata = Formdata::find($request->formdataid);
-            $currentarray = $formdata->data;
-            $changearray = $data1['data'];
-            $formdata->update($data1);
-            Log::channel('user')->info('Userid -> ' . auth()->user()->custom_userid . ' , Application Edited by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Application Name -> ' . $application->name . ' Current Data -> ' . $currentarray . ' Change Data -> ' . $changearray);
-
-            return redirect()
-                ->back()
-                ->with('success', 'Form Updated.');
-        } else {
-            # code...
-            $data1['data'] = json_encode($data);
-            $data1['userid'] = $request->userid;
-            $data1['application_id'] = $id;
-            // dd($data);
-            //workflow functionality
-            // $workflow = Workflow::where('application_id', $id)->first();
-            // $tasks = Task::where('workflow_id', $workflow->id)
-            //     ->latest()
-            //     ->get();
-            // dd($workflow, $tasks);
-            // $this->workflow($tasks);
-            // for ($i = 0; $i < count($tasks); $i++) {
-            //     # code...
-            //     if ($tasks[$i]->name == 'SendNotification') {
-            //         # code...
-            //         $sendmail = false;
-            //         $wdata = json_decode($tasks[$i]->data_fields);
-            //         // dd($data);
-            //         $subject = $wdata->name;
-            //         $notification = $wdata->notification;
-
-            //     }
-
-            //     $parenttask = Task::where('id', $tasks[$i]->parentable_id)->first();
-            //     // // dd($parenttask);
-            //     // if (isset($parenttask->name) && $parenttask->name == 'EvaluateContent') {
-            //     //     $wdata1 = json_decode($parenttask->data_fields);
-            //     //     // dd($wdata1);
-            //     //     for ($j = 0; $j < count($wdata1->fieldname); $j++) {
-            //     //         # code...
-            //     //         if (array_key_exists($wdata1->fieldname[$j], $data)) {
-            //     //             # code...
-            //     //             // dd($wdata1->fieldname[$j], $data);
-            //     //             if ($wdata1->operators[$j] == 'equal') {
-            //     //                 # code...
-            //     //                 if ($data[$wdata1->fieldname[$j]] == $wdata1->values[$j]) {
-
-            //     //                     # code...
-            //     //                     // dd($notification);
-            //     //                     $mailsend = Mail::send('email.useraction', ['data' => $notification], function ($message) use($notification, $subject) {
-            //     //                         $message->sender('jakpower@omegawebdemo.com.au');
-            //     //                         $message->subject($subject);
-            //     //                         $message->to(auth()->user()->email);
-            //     //                     });
-            //     //                 }
-            //     //             }
-            //     //         }
-            //     //     }
-            //     // }
-            // }
-            Log::channel('user')->info('Application Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Application Name -> ' . $application->name . ' Current Data -> ' . $data1['data']);
-            // dd('Demo purpose only ask if condition match form create or not.');
-            Formdata::create($data1);
-            return redirect()
-                ->route('userapplication.list', $id)
-                ->with('success', 'Form Saved.');
-        }
-        try {
         } catch (\Exception $th) {
             //throw $th;
             //throw $th;
             return redirect()
-                ->back()
+                ->route('userapplication.list', $id)
                 ->with('error', $th->getMessage());
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
         try {
             //code...
             // dd($id);
+
             $form = Formdata::find($id);
             $application = Application::find($form->application_id);
+            // $roles = Application_roles::where('applicationid', $id)->first();
+            // if ($roles->delete != 1) {
+            //     # code...
+            //     throw new \Exception('Admin change your functionality');
+            // }
+
             Log::channel('user')->info('Userid ' . auth()->user()->custom_userid . ' , Application Deleted by ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Application Name -> ' . $application->name);
             Formdata::destroy($id);
             return redirect()
@@ -327,47 +371,20 @@ class UserApplicationController extends Controller
 
             $forms = Formdata::where(['userid' => auth()->id(), 'application_id' => $id])->get();
             $application = Application::find($id);
-            $roles = $application->rolestable()->first();
-            $dbfields = Field::where(['application_id' => $application->id, 'status' => 1])
+            // $roles = $application->rolestable()->first();
+            $loggedinuser = auth()->user();
+            $userroles = json_decode($loggedinuser->roleids);
+
+            $roles = Application_roles::where('applicationid', $id)->first();
+            $totalfields = Field::where(['application_id' => $application->id, 'status' => 1])
                 ->orderBy('forder', 'ASC')
                 ->get();
 
-            $fields = [];
-            $userid = [];
-            for ($i = 0; $i < count($dbfields); $i++) {
-                # code...
-
-                if ($dbfields[$i]->access == 'private') {
-                    # code...
-                    if ($dbfields[$i]->groups != 'null') {
-                        array_push($userid, $this->findusers($dbfields[$i]->groups));
-                        // if ($dbfields[$i]->rolestable()->first()->group_list != 'null') {
-                        //     # code...
-                        // }
-
-                        // if ($dbfields[$i]->rolestable()->first()->user_list != 'null') {
-                        //     # code...
-                        //     array_push($userid, json_decode($dbfields[$i]->rolestable()->first()->user_list));
-                        // }
-
-                        $useridfound = 'false';
-                        // dd(in_array(auth()->id(), $userid[2]));
-                        for ($j = 0; $j < count($userid); $j++) {
-                            if (in_array(auth()->id(), $userid[$j])) {
-                                $useridfound = 'true';
-                            }
-                        }
-
-                        if ($useridfound == 'true') {
-                            array_push($fields, $dbfields[$i]);
-                        }
-                        // dd($fields);
-                    }
-                } else {
-                    # code...
-                    array_push($fields, $dbfields[$i]);
-                }
-            }
+            $fieldids = $this->returnuser($id, $totalfields);
+            $fields = Field::find($fieldids);
+            $users = User::where('status', 1)->get();
+            $groups = Group::where('status', 1)->get();
+            // dd($applicationids);
 
             $indexing = ApplicationIndexing::where(['userid' => auth()->id(), 'application_id' => $application->id])->first();
             if ($indexing) {
@@ -378,10 +395,6 @@ class UserApplicationController extends Controller
                 $index = null;
             }
 
-            // dd($index, $fields);
-            // dd($fields);
-            // dd($application->rolestable()->get());
-            // dd($forms, $fields, $index);
             return view('backend.userapplication.applicationlist', compact('forms', 'index', 'id', 'application', 'roles', 'fields'));
         } catch (\Exception $th) {
             //throw $th;
@@ -398,50 +411,18 @@ class UserApplicationController extends Controller
             //code...
             $form_data = Formdata::find($id);
             $application = Application::find($form_data->application_id);
-            $users = User::latest()->get();
-            $groups = Group::latest()->get();
-            $dbfields = Field::where(['application_id' => $application->id, 'status' => 1])
+            $totalfields = Field::where(['application_id' => $application->id, 'status' => 1])
                 ->orderBy('forder', 'ASC')
                 ->get();
 
-            $fields = [];
-            $userid = [];
-            for ($i = 0; $i < count($dbfields); $i++) {
-                # code...
-
-                if ($dbfields[$i]->access == 'private') {
-                    # code...
-                    if ($dbfields[$i]->groups != 'null') {
-                        array_push($userid, $this->findusers($dbfields[$i]->groups));
-                        // if ($dbfields[$i]->rolestable()->first()->group_list != 'null') {
-                        //     # code...
-                        // }
-
-                        // if ($dbfields[$i]->rolestable()->first()->user_list != 'null') {
-                        //     # code...
-                        //     array_push($userid, json_decode($dbfields[$i]->rolestable()->first()->user_list));
-                        // }
-
-                        $useridfound = 'false';
-                        // dd(in_array(auth()->id(), $userid[2]));
-                        for ($j = 0; $j < count($userid); $j++) {
-                            if (in_array(auth()->id(), $userid[$j])) {
-                                $useridfound = 'true';
-                            }
-                        }
-
-                        if ($useridfound == 'true') {
-                            array_push($fields, $dbfields[$i]);
-                        }
-                        // dd($fields);
-                    }
-                } else {
-                    # code...
-                    array_push($fields, $dbfields[$i]);
-                }
-            }
+            $fieldids = $this->returnuser($id, $totalfields);
+            $fields = Field::find($fieldids);
+            $users = User::where('status', 1)->get();
+            $groups = Group::where('status', 1)->get();
 
             $filledformdata = json_decode($form_data->data, true);
+
+            // dd($form_data, $fields, $filledformdata);
             unset($filledformdata['type123']);
             return view('backend.userapplication.applicationedit', compact('groups', 'id', 'users', 'application', 'fields', 'filledformdata'));
             // dd($id);
@@ -454,22 +435,22 @@ class UserApplicationController extends Controller
         }
     }
 
-    public function findusers($data)
-    {
-        $array = json_decode($data);
-        $userids = [];
-        for ($i = 0; $i < count($array); $i++) {
-            # code...
-            $userarray = Group::find($array[$i]);
-            $newarray = json_decode($userarray->userids);
-            for ($j = 0; $j < count($newarray); $j++) {
-                # code...
-                array_push($userids, $newarray[$j]);
-            }
-            // array_merge($userids, json_decode($userarray->userids));
-        }
-        return $userids;
-    }
+    // public function findusers($data)
+    // {
+    //     $array = json_decode($data);
+    //     $userids = [];
+    //     for ($i = 0; $i < count($array); $i++) {
+    //         # code...
+    //         $userarray = Group::find($array[$i]);
+    //         $newarray = json_decode($userarray->userids);
+    //         for ($j = 0; $j < count($newarray); $j++) {
+    //             # code...
+    //             array_push($userids, $newarray[$j]);
+    //         }
+    //         // array_merge($userids, json_decode($userarray->userids));
+    //     }
+    //     return $userids;
+    // }
 
     public function userapplication_index($id)
     {
@@ -478,46 +459,12 @@ class UserApplicationController extends Controller
             if ($indexing) {
                 # code...
                 $application = Application::find($id);
-                $dbfields = Field::where(['application_id' => $application->id, 'status' => 1])
+                $totalfields = Field::where(['application_id' => $application->id, 'status' => 1])
                     ->orderBy('forder', 'ASC')
                     ->get();
 
-                $fields = [];
-                $userid = [];
-                for ($i = 0; $i < count($dbfields); $i++) {
-                    # code...
-
-                    if ($dbfields[$i]->access == 'private') {
-                        # code...
-                        if ($dbfields[$i]->groups != 'null') {
-                            array_push($userid, $this->findusers($dbfields[$i]->groups));
-                            // if ($dbfields[$i]->rolestable()->first()->group_list != 'null') {
-                            //     # code...
-                            // }
-
-                            // if ($dbfields[$i]->rolestable()->first()->user_list != 'null') {
-                            //     # code...
-                            //     array_push($userid, json_decode($dbfields[$i]->rolestable()->first()->user_list));
-                            // }
-
-                            $useridfound = 'false';
-                            // dd(in_array(auth()->id(), $userid[2]));
-                            for ($j = 0; $j < count($userid); $j++) {
-                                if (in_array(auth()->id(), $userid[$j])) {
-                                    $useridfound = 'true';
-                                }
-                            }
-
-                            if ($useridfound == 'true') {
-                                array_push($fields, $dbfields[$i]);
-                            }
-                            // dd($fields);
-                        }
-                    } else {
-                        # code...
-                        array_push($fields, $dbfields[$i]);
-                    }
-                }
+                $fieldids = $this->returnuser($id, $totalfields);
+                $fields = Field::find($fieldids);
                 $i = 0;
                 return view('backend.userapplication.userapplicationindex', compact('id', 'fields', 'indexing', 'i'));
             } else {

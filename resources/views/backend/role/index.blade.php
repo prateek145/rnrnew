@@ -15,7 +15,7 @@
                         <tr class="text-dark">
                             <th scope="col">Name</th>
                             {{-- <th scope="col">Name</th> --}}
-                            <th>Group Name</th>
+                            {{-- <th>Group Name</th> --}}
                             <th scope="col">Status</th>
                             <th scope="col">Created By</th>
                             <th scope="col">Updated By</th>
@@ -33,7 +33,7 @@
 
                                 </td>
 
-                                <td>
+                                {{-- <td>
                                     @php
                                         $groupids = json_decode($item->groupids);
                                         $goups = App\Models\backend\Group::find($groupids);
@@ -43,7 +43,7 @@
                                         <span>{{ $item1->name }}</span> 
                                     @endforeach
 
-                                </td>
+                                </td> --}}
                                 <td>
                                     @if ($item->status == 1)
                                         Active
@@ -53,27 +53,11 @@
                                 </td>
 
                                 <td>
-                                    @php
-                                    if ($item->created_by) {
-                                        $user = App\Models\User::find($item->created_by);
-                                        $createdby = $user->name;
-                                    } else {
-                                        $createdby = 'none';
-                                    }
-                                    @endphp
-                                    {{ $createdby }}
+                                    {{ $item->rolecreatedby->name ?? "none" }}
                                 </td>
 
                                 <td>
-                                    @php
-                                    if ($item->updated_by) {
-                                        $user = App\Models\User::find($item->updated_by);
-                                        $updatedby = $user->name;
-                                    } else {
-                                        $updatedby = 'none';
-                                    }
-                                    @endphp
-                                    {{ $updatedby }}
+                                    {{ $item->roleupdatedby->name ?? 'none' }}
                                 </td>
                                 <td>{{ $item->created_at == true ? $item->created_at->toDateString() : ""}}</td>
                                 <td>{{ $item->updated_at == true ? $item->updated_at->toDateString() : ""}}</td>

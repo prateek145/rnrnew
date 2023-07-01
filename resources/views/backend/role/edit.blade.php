@@ -130,7 +130,7 @@
                                                                     style="max-height: 10%; overflow:auto;">
                                                                     @foreach ($groups as $item)
                                                                         {{-- {{dd($item, $group->groupids)}} --}}
-                                                                        @if ($role->groupids != null && in_array($item->id, json_decode($role->groupids)))
+                                                                        @if (in_array($item->id, $selectedgroupids))
                                                                             <span><input class="talents_idmd-checkbox"
                                                                                     onchange="dragdrop(this.value, this.id, 'groupids[]');"
                                                                                     type="checkbox"
@@ -154,22 +154,9 @@
                                                             <div class="mb-3">
                                                                 <label for="users" class="form-label">Selected
                                                                     Groups</label>
-                                                                @php
-                                                                    $groupids = json_decode($role->groupids);
-                                                                    $groups1 = App\Models\backend\Group::find($groupids);
-                                                                    if ($groups1) {
-                                                                        # code...
-                                                                    } else {
-                                                                        # code...
-                                                                        $groups1 = [];
-                                                                    }
-                                                                    
-                                                                    // dd($groups1);
-                                                                    
-                                                                @endphp
                                                                 <select name="groupids[]" id=""
                                                                     class="form-control" required multiple>
-                                                                    @foreach ($groups1 as $item)
+                                                                    @foreach ($selectedgroups as $item)
                                                                         <option value="{{ $item->id }}"
                                                                             id="{{ $item->name }}" selected>
                                                                             {{ $item->name . ' ' . $item->lastname }}

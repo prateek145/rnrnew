@@ -8,6 +8,9 @@ use App\Models\backend\Field;
 use App\Models\User;
 use App\Models\backend\Group;
 use App\Models\backend\Application;
+use App\Models\backend\ApplicationField;
+use App\Models\backend\Fielduserid;
+use App\Models\backend\Fieldgroupid;
 use Illuminate\Support\Facades\Log;
 
 class FieldController extends Controller
@@ -56,97 +59,73 @@ class FieldController extends Controller
         ];
 
         $custommessages = [
-            'name.required' => "Required"
+            'name.required' => 'Required',
         ];
 
         $this->validate($request, $rules, $custommessages);
+        //code...
+        // dd($request->all());
         try {
-            //code...
-            // dd($request->all());
             $data = $request->all();
             unset($data['applicationid']);
+            unset($data['users']);
+            unset($data['groups']);
     
             $application = Application::find($request->application_id);
             // dd($application);
             $applicationfields = Field::where('application_id', $application->id)->get();
-            for ($i=0; $i <count($applicationfields) ; $i++) { 
+            for ($i = 0; $i < count($applicationfields); $i++) {
                 # code...
                 if ($applicationfields[$i]->keyfield == 1) {
                     # code...
                     // dd('prateek');
                     if (isset($request->keyfield) && $request->keyfield == 1) {
                         # code...
-                        throw new \Exception("Already Assign Key field");
+                        throw new \Exception('Already Assign Key field');
                     }
-                    
                 }
             }
     
-            
-            
-    
             unset($data['_token']);
             if ($request->valuelistvalue) {
-                # code...
                 unset($data['valuelistvalue']);
                 $data['valuelistvalue'] = json_encode($request->valuelistvalue);
             }
     
-            if ($request->user_list) {
-                # code...
-                unset($data['user_list']);
-                $data['user_list'] = json_encode($request->user_list);
-            }
-    
-            if ($request->group_list) {
-                # code...
-                unset($data['group_list']);
-                $data['group_list'] = json_encode($request->group_list);
-            }
-    
-            // dd($data);
-            if ($request->groups) {
-                # code...
-                if (count($request->groups) > 0) {
-                    // dd($request->groups);
-                    # code...
-                    $data['groups'] = json_encode($request->groups);
-                }
-            }
-    
-            if ($request->users) {
-                # code...
-                if (count($request->users) > 0) {
-                    // dd($request->groups);
-                    # code...
-                    $data['users'] = json_encode($request->users);
-                }
-            }
-    
-            if ($request->access == 'public') {
-                # code...
-                $data['groups'] = null;
-            }
             // dd($data);
             $data['forder'] = count($applicationfields) + 1;
             // dd($data);
             $field = Field::create($data);
             Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Field Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Field Name -> ' . $field->name . ' Field Type -> ' . $field->type);
     
-            // dd($field, $field->id);
-            if ($application->fields == null) {
-                # code...
-                $fieldid = [];
-                array_push($fieldid, $field->id);
-                $application->fields = json_encode($fieldid);
-                $application->save();
-            } else {
-                # code...
-                $fieldid = json_decode($application->fields);
-                array_push($fieldid, $field->id);
-                $application->fields = json_encode($fieldid);
-                $application->save();
+            // dd($request->groups);
+            if ($request->groups) {
+                for ($i = 0; $i < count($request->groups); $i++) {
+                    $fieldgroup = new Fieldgroupid();
+                    $fieldgroup->applicationid = $application->id;
+                    $fieldgroup->fieldid = $field->id;
+                    $fieldgroup->groupids = $request->groups[$i];
+                    $fieldgroup->userid = auth()->id();
+                    $fieldgroup->save();
+                }
             }
+    
+            if ($request->users) {
+                for ($i = 0; $i < count($request->users); $i++) {
+                    $fielduser = new Fielduserid();
+                    $fielduser->applicationid = $application->id;
+                    $fielduser->fieldid = $field->id;
+                    $fielduser->userids = $request->users[$i];
+                    $fielduser->userid = auth()->id();
+                    $fielduser->save();
+                }
+            }
+    
+            $applicationfield = new ApplicationField();
+            $applicationfield->applicationid = $application->id;
+            $applicationfield->fieldid = $field->id;
+            $applicationfield->userid = auth()->id();
+            $applicationfield->save();
     
             return redirect()
                 ->route('application.edit', $application->id)
@@ -154,8 +133,8 @@ class FieldController extends Controller
         } catch (\Exception $th) {
             //throw $th;
             return redirect()
-                ->back()
-                ->with('error', $th->getMessage());
+            ->back()
+            ->with('error', $th->getMessage());
         }
     }
 
@@ -173,6 +152,7 @@ class FieldController extends Controller
             ->latest()
             ->get();
         $users = User::where('status', 1)
+            ->where('role', '!=', 'admin')
             ->latest()
             ->get();
         $application = Application::find($id);
@@ -196,62 +176,39 @@ class FieldController extends Controller
                 ->get();
 
             $users = User::where('status', 1)
+                ->where('role', '!=', 'admin')
                 ->latest()
                 ->get();
 
-            $selectedgroups = [];
-            if ($field->groups != null) {
-                $groupids = json_decode($field->groups);
+            if ($field->access == 'private') {
                 # code...
-                for ($i = 0; $i < count($groupids); $i++) {
-                    # code...
-                    $group = Group::find($groupids[$i]);
-                    array_push($selectedgroups, $group);
-                }
-            }
+                $selectedgroups = Fieldgroupid::where('fieldid', $id)
+                    ->pluck('groupids')
+                    ->toArray();
+                $selectedusers = Fielduserid::where('fieldid', $id)
+                    ->pluck('userids')
+                    ->toArray();
 
-            $selectedusers = [];
-            if ($field->users != null) {
-                $userids = json_decode($field->users);
-                // dd($userids);
-                # code...
-                for ($i = 0; $i < count($userids); $i++) {
+                if ($selectedusers != []) {
                     # code...
-                    $user = User::find($userids[$i]);
-                    array_push($selectedusers, $user);
+                    $selectedusersarray = User::find($selectedusers);
                 }
-            }
-            // dd($selectedusers, $selectedgroups);
 
-            if ($field->user_list != null) {
-                # code...
-                $userid = json_decode($field->user_list);
-                $userlist = [];
-                for ($i = 0; $i < count($userid); $i++) {
+                if ($selectedgroups != []) {
                     # code...
-                    $user = User::find($userid[$i]);
-                    array_push($userlist, $user);
+                    $selectedgrouparray = Group::find($selectedgroups);
                 }
             } else {
-                $userlist = null;
-            }
-
-            // dd($userlist);
-
-            if ($field->group_list != null) {
                 # code...
-                $groupid = json_decode($field->group_list);
-                $grouplist = [];
-                for ($i = 0; $i < count($groupid); $i++) {
-                    # code...
-                    $group = Group::find($groupid[$i]);
-                    array_push($grouplist, $group);
-                }
-            } else {
-                $grouplist = null;
+                $selectedgroups = [];
+                $selectedusers = [];
+                $selectedusersarray = [];
+                $selectedgrouparray = [];
             }
+
+            // dd($selectedusersarray, $selectedgrouparray);
             // dd($userlist, $field);
-            return view('backend.field.edit', compact('userlist', 'selectedusers', 'grouplist', 'field', 'groups', 'selectedgroups', 'users'));
+            return view('backend.field.edit', compact('selectedusersarray', 'selectedgrouparray', 'selectedusers', 'field', 'groups', 'selectedgroups', 'users'));
         } catch (\Exception $th) {
             //throw $th;
             return redirect()
@@ -287,6 +244,7 @@ class FieldController extends Controller
 
         unset($data['_token']);
         unset($data['_method']);
+        unset($data['users']);
         unset($data['groups']);
 
         if ($request->valuelistvalue) {
@@ -308,25 +266,66 @@ class FieldController extends Controller
         }
 
         // dd($data);
-        if ($request->groups) {
-            # code...
-            if (count($request->groups) > 0) {
-                // dd($request->groups);
-                # code...
-                $data['groups'] = json_encode($request->groups);
-            }
-        }
+        // if ($request->groups) {
+        //     # code...
+        //     if (count($request->groups) > 0) {
+        //         // dd($request->groups);
+        //         # code...
+        //         $data['groups'] = json_encode($request->groups);
+        //     }
+        // }
 
-        if ($request->access == 'public') {
-            # code...
-            $data['groups'] = null;
-            $data['users'] = null;
-        }
+
         // dd($data);
 
         //for logs
         $field = Field::find($id);
         // dd($field);
+        // dd($request->groups);
+
+        //for delete if user make private field to public
+        if ($request->access == 'public') {
+            $dids1 = Fieldgroupid::where('fieldid', $field->id)->pluck('id');
+            if ($dids1) {
+                # code...
+                Fieldgroupid::destroy($dids1);
+            }
+
+            $dids2 = Fielduserid::where('fieldid', $field->id)->pluck('id');
+            if ($dids2) {
+                # code...
+                Fielduserid::destroy($dids2);
+            }
+        }
+
+        if ($request->groups) {
+           
+            $dids = Fieldgroupid::where('fieldid', $field->id)->pluck('id');
+            Fieldgroupid::destroy($dids);
+            for ($i = 0; $i < count($request->groups); $i++) {
+                $fieldgroup = new Fieldgroupid();
+                $fieldgroup->applicationid = $field->application_id;
+                $fieldgroup->fieldid = $field->id;
+                $fieldgroup->groupids = $request->groups[$i];
+                $fieldgroup->userid = auth()->id();
+                $fieldgroup->save();
+            }
+        }
+
+        if ($request->users) {
+           
+            $dids = Fielduserid::where('fieldid', $field->id)->pluck('id');
+            Fielduserid::destroy($dids);
+            for ($i = 0; $i < count($request->users); $i++) {
+                $fielduser = new Fielduserid();
+                $fielduser->applicationid = $field->application_id;
+                $fielduser->fieldid = $field->id;
+                $fielduser->userids = $request->users[$i];
+                $fielduser->userid = auth()->id();
+                $fielduser->save();
+            }
+        }
+
         $changearray = [];
         if ($field->status == 1) {
             # code...
@@ -434,6 +433,7 @@ class FieldController extends Controller
             $changearray['description'] = $data['description'];
         }
 
+        // dd($data);
         $field->update($data);
         Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Field Edited by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Field Name -> ' . $field->name . ' Current Data -> ' . json_encode($currentarray) . ' Changed Data -> ' . json_encode($changearray));
 
@@ -462,18 +462,8 @@ class FieldController extends Controller
             // dd($id);
             $field = Field::find($id);
             $application = Application::find($field->application_id);
-            $fieldid = json_decode($application->fields);
-            // dd($fieldid, $fieldid[0]);
-            for ($i = 0; $i < count($fieldid); $i++) {
-                # code...
-                if ($fieldid[$i] == $id) {
-                    # code...
-                    unset($fieldid[$i]);
-                }
-            }
-            // dd($fieldid);
-            $application->fields = json_encode($fieldid);
-            $application->save();
+            $destroyids = ApplicationField::where(['applicationid'=> $application->id, 'fieldid'=> $field->id])->pluck('id');
+            ApplicationField::destroy($destroyids);
             Log::channel('custom')->info('Userid ' . auth()->user()->custom_userid . ' , Field Deleted by ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Field Name -> ' . $field->name);
             Field::destroy($id);
             return redirect()

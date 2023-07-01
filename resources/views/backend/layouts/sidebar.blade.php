@@ -26,15 +26,18 @@
         </div>
         <div class="navbar-nav w-100">
             @if (auth()->user()->role == 'admin')
-                <a href="{{ route('backend.home') }}" class="nav-item nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="{{ route('backend.home') }}" class="nav-item nav-link"><i class="bi bi-speedometer2"></i>
+                    Dashboard</a>
             @else
-                <a href="{{ route('user.backend.home') }}" class="nav-item nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="{{ route('user.backend.home') }}" class="nav-item nav-link"><i class="bi bi-speedometer2"></i>
+                    Dashboard</a>
             @endif
 
 
             @if (auth()->user()->role == 'admin')
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-person"></i> Users</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-person"></i> Users</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="{{ route('users.index') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('users.create') }}" class="dropdown-item">New</a> --}}
@@ -43,7 +46,8 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-columns-gap"></i> Applications</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                            class="bi bi-columns-gap"></i> Applications</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="{{ route('application.index') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('application.create') }}" class="dropdown-item">New</a> --}}
@@ -52,7 +56,8 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-people"></i> Groups</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-people"></i> Groups</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="{{ route('group.index') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
@@ -61,7 +66,8 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-boxes"></i> Roles</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-boxes"></i> Roles</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="{{ route('role.index') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
@@ -70,7 +76,8 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-link-45deg"></i> Integration</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-link-45deg"></i> Integration</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="#" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
@@ -79,16 +86,28 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-person-workspace"></i> C. Dashboard</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-person-workspace"></i> C. Dashboard</a>
                     <div class="dropdown-menu bg-transparent border-0">
-                        <a href="#" class="dropdown-item">View All</a>
+                        <a href="{{ route('dashboard.index') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
 
                     </div>
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-list-columns-reverse"></i> Logs</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-person-workspace"></i> Reports</a>
+                    <div class="dropdown-menu bg-transparent border-0">
+                        <a href="{{ route('report.index') }}" class="dropdown-item">View All</a>
+                        {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
+
+                    </div>
+                </div>
+
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-list-columns-reverse"></i> Logs</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="{{ url('logs') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
@@ -97,7 +116,8 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-key"></i> MFA</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-key"></i> MFA</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="#" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
@@ -106,58 +126,24 @@
                 </div>
 
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="bi bi-exclamation-triangle"></i> Notifications</a>
+                    <a href="#" class="nav-item nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
+                            class="bi bi-exclamation-triangle"></i> Notifications</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a href="{{ route('notifications.index') }}" class="dropdown-item">View All</a>
                         {{-- <a href="{{ route('group.create') }}" class="dropdown-item">New</a> --}}
 
                     </div>
                 </div>
+
             @endif
 
             @if (auth()->user()->role != 'admin')
                 @php
-                    $loggedinuser = auth()->id();
-                    // dd($userid);
-                    $application = App\Models\backend\Application::where('status', 1)
-                        // ->latest()
-                        ->get();
-                    
-                    $userapplication = [];
-                    $userid = [];
-                    // dd($application[1]->rolestable()->first());
-                    
-                    for ($i = 0; $i < count($application); $i++) {
-                        # code...
-                        if ($application[$i]->rolestable()->get() != 'null' && $application[$i]->rolestable()->get() != null) {
-                            $rolestablearray = $application[$i]->rolestable()->get();
-                    
-                            for ($k = 0; $k < count($rolestablearray); $k++) {
-                                if ($rolestablearray[$k]->group_list != 'null') {
-                                    # code...
-                                    array_push($userid, Helper::findusers($rolestablearray[$k]->group_list));
-                                }
-                                // dd(json_decode($rolestablearray[0]->user_list));
-                                if ($rolestablearray[$k]->user_list != 'null') {
-                                    # code...
-                                    array_push($userid, json_decode($rolestablearray[$k]->user_list));
-                                }
-                            }
-                    
-                            $useridfound = 'false';
-                            // dd(in_array(auth()->id(), $userid[2]));
-                            for ($j = 0; $j < count($userid); $j++) {
-                                if (in_array(auth()->id(), $userid[$j])) {
-                                    $useridfound = 'true';
-                                }
-                            }
-                            // dd($useridfound);
-                    
-                            if ($useridfound == 'true') {
-                                array_push($userapplication, $application[$i]);
-                            }
-                        }
-                    }
+                    $loggedinuser = auth()->user();
+                    $userroles = $loggedinuser->userroles()->pluck('roleids');
+                    $applicationids = App\Models\backend\Application_roles::where('roleid', $userroles)->where('read', '!=', '0')->pluck('applicationid');
+                    // print_r($applicationids);
+                    $applications = App\Models\backend\Application::find($applicationids);
                     
                 @endphp
 
@@ -167,7 +153,7 @@
                     <div class="dropdown-menu bg-transparent border-0">
                         {{-- <a href="{{ route('user-application.index') }}" class="dropdown-item">View All</a> --}}
                         {{-- <a href="{{ route('application.create') }}" class="dropdown-item">New</a> --}}
-                        @foreach ($userapplication as $item)
+                        @foreach ($applications as $item)
                             <a class="dropdown-item" href="{{ route('userapplication.list', $item->id) }}">
                                 {{ $item->name }}</a>
                         @endforeach

@@ -16,7 +16,7 @@
                             <h6 class="mb-4">Application Form</h6>
                             <button type="button" class="btn btn-danger">
                                 <a href="{{ route('userapplication.list', $application->id) }}" style="color:aliceblue">
-                                    <- back</a>
+                                     back</a>
                             </button>
                         </div>
                         <form action="{{ route('user-application.update', $application->id) }}" class="form-horizontal"
@@ -27,6 +27,7 @@
                                 $i = 0;
                             @endphp
                             @foreach ($fields as $item)
+                                
                                 @if ($item->type == 'date')
                                     <div class="mb-3">
                                         <label for="exampleInputEmail1"

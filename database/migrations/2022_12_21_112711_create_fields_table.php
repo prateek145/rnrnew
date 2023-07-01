@@ -19,8 +19,6 @@ return new class extends Migration {
             $table->string('datetype')->nullable();
             $table->string('valuelisttype')->nullable();
             $table->longText('valuelistvalue')->nullable();
-            $table->string('user_list')->nullable();
-            $table->string('group_list')->nullable();
             $table->string('attachmenttype')->nullable();
             $table->string('attachmentsize')->nullable();
             $table->string('access')->nullable();
@@ -33,8 +31,6 @@ return new class extends Migration {
             $table->integer('requiredfield')->default(0);
             $table->integer('requireuniquevalue')->default(0);
             $table->integer('keyfield')->default(0);
-            $table->longText('groups')->nullable();
-            $table->longText('users')->nullable();
             // $table->string('name')->nullable();
             $table->timestamps();
         });

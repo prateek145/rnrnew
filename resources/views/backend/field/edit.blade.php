@@ -117,38 +117,126 @@
                                     <div class="accordion-body">
 
 
-                                        <input type="radio" name="access" value="public">
+                                        <input type="radio" name="access" onclick="showgroupsname('false')"
+                                            value="public" {{ $field->access == 'public' ? 'checked' : '' }} required>
                                         <label for="">Public</label><br>
 
                                         <div class="row mb-2">
                                             <div class="col-md-10">
-                                                <input type="radio" onclick="showgroupsname()" name="access"
-                                                    value="private">
+                                                <input type="radio" onclick="showgroupsname('true')" name="access"
+                                                    value="private" {{ $field->access == 'private' ? 'checked' : '' }}
+                                                    required>
                                                 <label for="">Private</label><br>
                                             </div>
 
                                         </div>
-                                        <div class="col-md-12 d-none showaddbtn" style="width: 100%">
+                                        <div class="col-md-12 d-block showaddbtn" style="width: 100%">
 
-                                            <div class="d-flex justify-content-between">
+                                            <div class="row">
                                                 <div class="col-md-6">
-                                                    <button type="button" class="btn btn-primary text-end"
-                                                        data-bs-toggle="modal" data-bs-target="#exampleModalusers"
-                                                        data-bs-whatever="@mdo">Add Users</button>
+                                                    <div class="mb-3 text-start">
+                                                        <label for="filter">Users&nbsp;</label><input id="filter"
+                                                            type="text" class="filter form-control"
+                                                            placeholder="Search Users">
+                                                        <br />
 
+                                                        <div id="mdi" style="max-height: 10%; overflow:auto;">
+                                                            @foreach ($users as $item)
+                                                                <span>
+                                                                    {{-- {{dd($selectedusers)}} --}}
+                                                                    {{-- dd --}}
+                                                                    @if ($selectedusers != [] && in_array($item->id, $selectedusers, true))
+                                                                        <input class="talents_idmd-checkbox"
+                                                                            onchange="dragdrop(this.value, this.id, 'users[]');"
+                                                                            type="checkbox"
+                                                                            id="{{ $item->name . ' ' . $item->lastname }}"
+                                                                            value="{{ $item->id }}"
+                                                                            checked>{{ $item->name . ' ' . $item->lastname }}
+                                                                    @else
+                                                                        <input class="talents_idmd-checkbox"
+                                                                            onchange="dragdrop(this.value, this.id, 'users[]');"
+                                                                            type="checkbox"
+                                                                            id="{{ $item->name . ' ' . $item->lastname }}"
+                                                                            value="{{ $item->id }}">{{ $item->name . ' ' . $item->lastname }}
+                                                                    @endif
+
+
+                                                                </span>
+                                                                <br>
+                                                            @endforeach
+                                                        </div>
+
+
+                                                    </div>
                                                 </div>
-
                                                 <div class="col-md-6">
-                                                    <button type="button" class="btn btn-primary text-end"
-                                                        data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                        data-bs-whatever="@mdo">Add Groups</button>
+                                                    <div class="mb-3">
+                                                        <label for="users">Selected Users</label>
+                                                        <select name="users[]" id="" class="form-control"
+                                                            multiple>
 
+                                                            @foreach ($selectedusersarray as $item)
+                                                                <option value="{{ $item->id }}"
+                                                                    id="{{ $item->name . ' ' . $item->lastname }}"
+                                                                    selected>{{ $item->name . ' ' . $item->lastname }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
+                                            </div>
 
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3 text-start">
+                                                        <label for="filter">Groups&nbsp;</label><input id="filter"
+                                                            type="text" class="filter form-control"
+                                                            placeholder="Search Groups">
+                                                        <br />
+
+                                                        <div id="mdi" style="max-height: 10%; overflow:auto;">
+                                                            @foreach ($groups as $item)
+                                                                <span>
+                                                                    {{-- {{dd($selectedgroups)}} --}}
+                                                                    @if ($selectedgroups != [] && in_array($item->id, $selectedgroups, true))
+                                                                        <input class="talents_idmd-checkbox"
+                                                                            onchange="dragdrop(this.value, this.id, 'groups[]');"
+                                                                            type="checkbox" id="{{ $item->name }}"
+                                                                            value="{{ $item->id }}"
+                                                                            checked>{{ $item->name . ' ' . $item->lastname }}
+                                                                    @else
+                                                                        <input class="talents_idmd-checkbox"
+                                                                            onchange="dragdrop(this.value, this.id, 'groups[]');"
+                                                                            type="checkbox" id="{{ $item->name }}"
+                                                                            value="{{ $item->id }}">{{ $item->name . ' ' . $item->lastname }}
+                                                                    @endif
+
+                                                                </span>
+                                                                <br>
+                                                            @endforeach
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="users">Selected Groups</label>
+                                                        <select name="groups[]" id="" class="form-control"
+                                                            multiple>
+                                                            @foreach ($selectedgrouparray as $item)
+                                                                <option value="{{ $item->id }}"
+                                                                    id="{{ $item->name }}" selected>{{ $item->name }}
+                                                                </option>
+                                                            @endforeach
+
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="d-none groupsname row">
+                                        {{-- <div class="d-none groupsname row">
                                             <div class="col-md-6">
                                                 <select id="" class="form-control " multiple disabled>
                                                     @foreach ($selectedusers as $item)
@@ -167,7 +255,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div> --}}
 
 
 
@@ -392,21 +480,27 @@
         }
 
         if (radioselected == 'private') {
-            var groupname = document.getElementsByClassName('groupsname')[0];
-            groupname.className = 'd-block groupsname';
-        }
-
-        if (radioselected == 'private') {
             var showaddbtn = document.getElementsByClassName('showaddbtn')[0];
             showaddbtn.className = 'col-md-2 d-block showaddbtn';
         }
 
-        function showgroupsname() {
-            var groupname = document.getElementsByClassName('groupsname')[0];
-            groupname.className = 'd-block groupsname';
-
+        if (radioselected == 'public') {
             var showaddbtn = document.getElementsByClassName('showaddbtn')[0];
-            showaddbtn.className = 'col-md-2 d-block showaddbtn';
+            showaddbtn.className = 'col-md-2 d-none showaddbtn';
+        }
+
+        function showgroupsname(value) {
+            // var groupname = document.getElementsByClassName('groupsname')[0];
+            // groupname.className = 'd-block groupsname';
+
+            if (value == 'true') {
+                var showaddbtn = document.getElementsByClassName('showaddbtn')[0];
+                showaddbtn.className = 'col-md-2 d-block showaddbtn';
+
+            } else {
+                var showaddbtn = document.getElementsByClassName('showaddbtn')[0];
+                showaddbtn.className = 'col-md-2 d-none showaddbtn';
+            }
         }
 
         function addvaluelist() {

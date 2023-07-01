@@ -298,7 +298,7 @@
 
                             <input type="hidden" value="{{ auth()->id() }}" name="userid">
 
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary" >Submit</button>
                         </form>
 
                     </div>

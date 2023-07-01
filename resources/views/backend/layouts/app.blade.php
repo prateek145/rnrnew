@@ -101,7 +101,7 @@
     <script>
         function dragdrop(value, name, fillbox) {
             // console.log(document.getElementById(name));
-            console.log(document.getElementById(name).checked);
+            // console.log(document.getElementById(name).checked);
             if (document.getElementById(name).checked) {
                 var userselect = document.getElementsByName(fillbox)[0];
                 var option = document.createElement('option');
@@ -112,6 +112,7 @@
                 userselect.appendChild(option);
             } else {
                 var userselect = document.getElementsByName(fillbox)[0];
+                console.log(userselect, name);
                 for (let index = 0; index < userselect.length; index++) {
                     if (userselect[index].id == name) {
                        userselect.removeChild(userselect[index]);
@@ -121,6 +122,7 @@
                 }
             }
         }
+
     </script>
     @yield('script')
 </body>

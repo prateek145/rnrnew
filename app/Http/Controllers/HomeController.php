@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\backend\Application;
 use App\Models\backend\Group;
+use App\Models\backend\Application_roles;
 use App\Helpers\Helper;
 
 class HomeController extends Controller
@@ -41,53 +42,11 @@ class HomeController extends Controller
             //code...
 
             $loggedinuser = auth()->user();
-            // dd($loggedinuser);
-
-            $application = Application::where('status', 1)
-                // ->latest()
-                ->get();
-
-            $userapplication = [];
-            $userid = [];
-            // dd($application[1]->rolestable()->first());
-
-            for ($i = 0; $i < count($application); $i++) {
-                # code...
-                if ($application[$i]->rolestable()->get() != 'null' && $application[$i]->rolestable()->get() != null) {
-
-                    $rolestablearray = $application[$i]->rolestable()->get();
-
-                    for ($k=0; $k < count($rolestablearray) ; $k++) { 
-                        // dd($rolestablearray[$k]->group_list);
-                        if ($rolestablearray[$k]->group_list != 'null') {
-                            # code...
-                            array_push($userid, Helper::findusers($rolestablearray[$k]->group_list));
-                        }
-                        // dd(json_decode($rolestablearray[0]->user_list));
-                        if ($rolestablearray[$k]->user_list != 'null') {
-                            # code...
-                            array_push($userid, json_decode($rolestablearray[$k]->user_list));
-                        }
-                    }
-
-                    $useridfound = 'false';
-                    // dd(in_array(auth()->id(), $userid[2]));
-                    for ($j = 0; $j < count($userid); $j++) {
-                        if (in_array(auth()->id(), $userid[$j])) {
-                            $useridfound = 'true';
-                        }
-                    }
-                    // dd($useridfound);
-
-                    if ($useridfound == 'true') {
-                        array_push($userapplication, $application[$i]);
-                    }
-                }
-            }
-  
-            // dd($userapplication);
-
-            return view('backend.backenduserhome');
+            $userroles = $loggedinuser->userroles()->pluck('roleids');
+            $applicationids = Application_roles::where('roleid', $userroles)->where('read', '!=', '0')->pluck('applicationid');
+            $applications = Application::find($applicationids);
+            // dd($userroles, $applicationids, $applications);
+            return view('backend.backenduserhome', compact('applications'));
         } catch (\Exception $th) {
             //throw $th;
             return redirect()
@@ -140,5 +99,10 @@ class HomeController extends Controller
             //     ]
             // );
         }
+    }
+
+    public function chart(){
+        // dd('prateek');
+        return view('backend.chart.index');
     }
 }

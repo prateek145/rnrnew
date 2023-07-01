@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\backend\Userrole;
+use App\Models\backend\Groupuserids;
+use App\Models\backend\Usergroup;
 
 class User extends Authenticatable
 {
@@ -36,4 +39,16 @@ class User extends Authenticatable
     ];
 
     protected $guarded = [];
+
+    public function userroles(){
+        return $this->hasMany(Userrole::class, 'userid', 'id');
+    }
+
+    public function usergroups(){
+        return $this->hasMany(Usergroup::class, 'userid', 'id');
+    }
+
+    public function selectedthroughgroup(){
+        return $this->hasMany(Groupuserids::class, 'userids', 'id');
+    }
 }

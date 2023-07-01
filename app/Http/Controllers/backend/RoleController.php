@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\backend\Application;
+use App\Models\backend\Rolegroup;
 use App\Models\backend\Group;
 use App\Models\backend\Role;
 use App\Models\User;
@@ -63,12 +64,14 @@ class RoleController extends Controller
             $rules = [
                 'name' => 'required|unique:roles',
                 'status' => 'required',
+                'groupids' => 'required'
             ];
 
             $custommessages = [
                 'name.required' => 'Name Required',
                 'name.unique' => 'Name Should Be Unique Required',
                 'status.required' => 'Status Required',
+                'groupids.required' => 'Group id Required',
             ];
 
             $this->validate($request, $rules, $custommessages);
@@ -76,26 +79,22 @@ class RoleController extends Controller
             $data = $request->all();
             // dd($data);
             unset($data['_token']);
+            unset($data['groupids']);
 
-            if (isset($request->userids)) {
-                # code...
-                unset($data['userids']);
-                $data['userids'] = json_encode($request->userids);
-            }
-
+            $role = Role::create($data);
             if (isset($request->groupids)) {
                 # code...
-                unset($data['groupids']);
-                $data['groupids'] = json_encode($request->groupids);
-            }
-
-            // $application = Application::find($request->application_id);
-            // dd($application);
-            if ($request->groupids == null) {
-                # code...
+                for ($i = 0; $i < count($request->groupids); $i++) {
+                    $rolegroup = new Rolegroup();
+                    $rolegroup->roleid = $role->id;
+                    $rolegroup->groupids = $request->groupids[$i];
+                    $rolegroup->created_by = auth()->id();
+                    $rolegroup->save();
+                }
+            }else{
                 throw new \Exception('Select Atleast Group.');
             }
-            $role1 = Role::create($data);
+           
             Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Role Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname);
 
             return redirect()
@@ -131,13 +130,14 @@ class RoleController extends Controller
         try {
             //code...
             $role = Role::find($id);
-            // dd($role);
+            $selectedgroupids = $role->rolegroup()->pluck('groupids')->toArray();
+            $selectedgroups = Group::find($selectedgroupids);
             $groups = Group::where('status', 1)
                 ->latest()
                 ->get();
             $applications = Application::orderBy('name')->get();
 
-            return view('backend.role.edit', compact('role', 'groups', 'applications'));
+            return view('backend.role.edit', compact('role', 'groups', 'applications', 'selectedgroupids', 'selectedgroups'));
         } catch (\Exception $th) {
             //throw $th;
             return redirect()
@@ -173,18 +173,30 @@ class RoleController extends Controller
 
             $this->validate($request, $rules, $custommessages);
 
-            $role = Role::find($id);
-
-         
-
             $data = $request->all();
+            unset($data['create']);
+            unset($data['read']);
+            unset($data['update']);
+            unset($data['delete']);
+            unset($data['groupids']);
+            $role = Role::find($id);
             if (isset($request->groupids)) {
                 # code...
-                unset($data['groupids']);
-                $data['groupids'] = json_encode($request->groupids);
+                $groupuserids = $role->rolegroup()->pluck('id');
+                Rolegroup::destroy($groupuserids);
+                for ($i = 0; $i < count($request->groupids); $i++) {
+                    $rolegroup = new Rolegroup();
+                    $rolegroup->roleid = $role->id;
+                    $rolegroup->groupids = $request->groupids[$i];
+                    $rolegroup->created_by = auth()->id();
+                    $rolegroup->save();
+                }
             }
+
+            //for logs
             $currentarray = $role;
             $changearray = $data;
+
             $role->update($data);
 
             Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Role Edited by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Current Data -> ' . json_encode($currentarray) . ' Changed Data -> ' . json_encode($changearray));

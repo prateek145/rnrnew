@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\backend\Group;
 use App\Models\backend\Application;
+use App\Models\backend\Groupgroupids;
+use App\Models\backend\Groupuserids;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
@@ -42,7 +44,7 @@ class GroupController extends Controller
     {
         try {
             //code...
-            $users = User::where('status', 1)->latest()->get();
+            $users = User::where('status', 1)->where('role', '!=' ,'admin')->latest()->get();
             $groups = Group::where('status', 1)->latest()->get();
             return view('backend.group.create', compact('users', 'groups'));
         } catch (\Exception $th) {
@@ -84,28 +86,36 @@ class GroupController extends Controller
             $data = $request->all();
             // dd($data);
             unset($data['_token']);
-           
+            unset($data['userids']);
+            unset($data['groupids']);
 
-            if (isset($data['userids'])) {
+            $group = Group::create($data);
+
+            if (isset($request->userids)) {
                 # code...
-                unset($data['userids']);
-                $data['userids'] = json_encode($request->userids);
+                for ($i = 0; $i < count($request->userids); $i++) {
+                    $groupuser = new Groupuserids();
+                    $groupuser->groupid = $group->id;
+                    $groupuser->userids = $request->userids[$i];
+                    $groupuser->created_by = auth()->id();
+                    $groupuser->save();
+                }
+
             }
 
-            if (isset($data['groupids'])) {
+            if (isset($request->groupids)) {
                 # code...
-                unset($data['groupids']);
-                $data['groupids'] = json_encode($request->groupids);
-            }
-
-            if (isset($data['mogroupids'])) {
-                # code...
-                unset($data['mogroupids']);
-                $data['mogroupids'] = json_encode($request->mogroupids);
+                for ($i = 0; $i < count($request->groupids); $i++) {
+                    $groupgroup = new Groupgroupids();
+                    $groupgroup->groupid = $group->id;
+                    $groupgroup->groupids = $request->groupids[$i];
+                    $groupgroup->created_by = auth()->id();
+                    $groupgroup->save();
+                }
             }
     
             // dd($data);
-            $group = Group::create($data);
+           
             Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Group Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Group Name -> ' . $group->name);
 
             return redirect()
@@ -143,19 +153,13 @@ class GroupController extends Controller
             $group = Group::find($id);
             // dd($application->attachments);
             $groups = Group::where('status', 1)->latest()->get();
-            $users = User::orderBy('name')->get();
-            $selectedusers = [];
-            if ($group->userids != null) {
-                # code...
-                $userids = json_decode($group->userids);
-                for ($i = 0; $i < count($userids); $i++) {
-                    # code...
-                    $user = User::find($userids[$i]);
-                    array_push($selectedusers, $user);
-                }
-            }
-            // dd($userids, $selectedusers);
-            return view('backend.group.edit', compact('group', 'users','groups', 'selectedusers'));
+            $users = User::where('status', 1)->where('role', '!=' ,'admin')->orderBy('name')->get();
+            $selectedusersids = $group->groupusers()->pluck('userids')->toArray();
+            $selectedgroupsids = $group->groupgroups()->pluck('groupids')->toArray();
+            $selectedusers = User::find($selectedusersids);
+            $selectedgroups = Group::find($selectedgroupsids);
+            // dd( $selectedusers, empty($selectedgroups));
+            return view('backend.group.edit', compact('group', 'users','groups', 'selectedusers', 'selectedusersids', 'selectedgroupsids', 'selectedgroups'));
             // dd($audit);
         } catch (\Exception $th) {
             //throw $th;
@@ -178,9 +182,6 @@ class GroupController extends Controller
             // dd($request->all());
             $rules = [
                 'name' => 'required',
-                // 'attachments' => 'required|mimes:pdf,jpg,png|min:5|max:2048',
-                // 'userids' => 'required',
-                // 'user_id' => 'required',
                 'status' => 'required',
                 // 'description' => 'required',
             ];
@@ -196,28 +197,47 @@ class GroupController extends Controller
             $data = $request->all();
             // dd($data);
             unset($data['_token']);
-           
+            unset($data['userids']);
+            unset($data['groupids']);
 
-            if (isset($data['userids'])) {
+            $group = Group::find($id);
+
+            if ($request->userids) {
                 # code...
-                unset($data['userids']);
-                $data['userids'] = json_encode($request->userids);
+                $groupuserids = $group->groupusers()->pluck('id');
+                Groupuserids::destroy($groupuserids);
+                // dd($groupuserids);
+                // dd('prateek');
+                for ($i = 0; $i < count($request->userids); $i++) {
+                    $groupuser = new Groupuserids();
+                    $groupuser->groupid = $group->id;
+                    $groupuser->userids = $request->userids[$i];
+                    $groupuser->created_by = auth()->id();
+                    $groupuser->save();
+                }
             }
 
-            if (isset($data['groupids'])) {
+            if ($request->groupids) {
                 # code...
-                unset($data['groupids']);
-                $data['groupids'] = json_encode($request->groupids);
+                $groupgroupids = $group->groupgroups()->pluck('id');
+                Groupgroupids::destroy($groupgroupids);
+                for ($i = 0; $i < count($request->groupids); $i++) {
+                    $groupgroup = new Groupgroupids();
+                    $groupgroup->groupid = $group->id;
+                    $groupgroup->groupids = $request->groupids[$i];
+                    $groupgroup->created_by = auth()->id();
+                    $groupgroup->save();
+                }
             }
 
-            if (isset($data['mogroupids'])) {
-                # code...
-                unset($data['mogroupids']);
-                $data['mogroupids'] = json_encode($request->mogroupids);
-            }
+            // if (isset($data['mogroupids'])) {
+            //     # code...
+            //     unset($data['mogroupids']);
+            //     $data['mogroupids'] = json_encode($request->mogroupids);
+            // }
     
             // dd($data);
-            $group = Group::find($id);
+      
             $group->update($data);
             Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Group Created by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Group Name -> ' . $group->name);
 
@@ -243,6 +263,10 @@ class GroupController extends Controller
         try {
             //code...
             $group = Group::find($id);
+            $groupuserids = $group->groupusers()->pluck('id');
+            Groupuserids::destroy($groupuserids);
+            $groupgroupids = $group->groupgroups()->pluck('id');
+            Groupgroupids::destroy($groupgroupids);
             Log::channel('custom')->info('Userid -> ' . auth()->user()->custom_userid . ' , Group Deleted by -> ' . auth()->user()->name . ' ' . auth()->user()->lastname . ' Group Name -> ' . $group->name);
             Group::destroy($id);
 

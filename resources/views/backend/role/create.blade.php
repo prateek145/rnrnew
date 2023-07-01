@@ -168,10 +168,10 @@
                                 </div>
                                 <div class="tab-pane fade" id="pills-contact" role="tabpanel"
                                     aria-labelledby="pills-contact-tab" tabindex="0">
+                                    <p>For Rights First Create Role Then Edit role</p>
 
 
-
-                                    <div class="accordion" id="accordionPanelsStayOpenExample">
+                                    {{-- <div class="accordion" id="accordionPanelsStayOpenExample">
                                         <div class="accordion-item">
                                             <h2 class="accordion-header">
                                                 <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -192,17 +192,17 @@
                                                             <thead>
                                                                 <tr class="text-dark">
                                                                     <th scope="col">Application Name</th>
-                                                                    {{-- <th scope="col">Name</th> --}}
+                                                            
                                                                     <th scope="col">Create</th>
                                                                     <th scope="col">Read</th>
                                                                     <th scope="col">Update</th>
                                                                     <th scope="col">Delete</th>
-                                                                    {{-- <th scope="col">Action</th> --}}
+                                                              
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 @foreach ($applications as $item)
-                                                                    {{-- {{ dd($item) }} --}}
+                                                       
                                                                     <tr>
                                                                         <td>
                                                                             <a href="#">
@@ -240,12 +240,6 @@
                                                                                     id="flexSwitchCheckDefault">
                                                                             </div>
                                                                         </td>
-                                                                        {{-- <td class="d-flex justify-content-betweenx"><a
-                                                                class="btn btn-sm btn-primary"
-                                                                href="#">Assign
-                                                                Role</a>
-
-                                                        </td> --}}
                                                                     </tr>
                                                                 @endforeach
 
@@ -256,7 +250,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                 </div>
                             </div>

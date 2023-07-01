@@ -45,51 +45,52 @@
                                     <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
                                         <div class="accordion-body">
                                             <div class="row">
-                                            <div class="mb-3 col-6">
-                                                <label for="exampleInputEmail1" class="form-label">First Name</label>
-                                                <input type="text"
-                                                    class="form-control @error('name') is-invalid @enderror" name="name"
-                                                    id="name" aria-describedby="namehelp" value="{{ $user->name }}"
-                                                    required>
-                                                @error('name')
-                                                    <label id="name-error" class="error text-danger"
-                                                        for="name">{{ $message }}</label>
-                                                @enderror
-                                                <div id="namehelp" class="form-text">
+                                                <div class="mb-3 col-6">
+                                                    <label for="exampleInputEmail1" class="form-label">First Name</label>
+                                                    <input type="text"
+                                                        class="form-control @error('name') is-invalid @enderror"
+                                                        name="name" id="name" aria-describedby="namehelp"
+                                                        value="{{ $user->name }}" required>
+                                                    @error('name')
+                                                        <label id="name-error" class="error text-danger"
+                                                            for="name">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="namehelp" class="form-text">
+                                                    </div>
                                                 </div>
+
+                                                <div class="mb-3 col-6">
+                                                    <label for="exampleInputEmail1" class="form-label">Last Name</label>
+                                                    <input type="text"
+                                                        class="form-control @error('lastname') is-invalid @enderror"
+                                                        name="lastname" id="lastname" value="{{ $user->lastname }}"
+                                                        aria-describedby="lastnamehelp" required>
+                                                    @error('lastname')
+                                                        <label id="lastname-error" class="error text-danger"
+                                                            for="lastname">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="lastnamehelp" class="form-text">
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3 col-12">
+                                                    <label for="exampleInputEmail1" class="form-label">User ID</label>
+                                                    <input type="text"
+                                                        class="form-control @error('lastname') is-invalid @enderror"
+                                                        name="custom_userid" id="lastname"
+                                                        value="{{ $user->custom_userid }}" aria-describedby="lastnamehelp"
+                                                        required>
+                                                    @error('lastname')
+                                                        <label id="lastname-error" class="error text-danger"
+                                                            for="lastname">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="lastnamehelp" class="form-text">
+                                                    </div>
+                                                </div>
+
                                             </div>
 
-                                            <div class="mb-3 col-6">
-                                                <label for="exampleInputEmail1" class="form-label">Last Name</label>
-                                                <input type="text"
-                                                    class="form-control @error('lastname') is-invalid @enderror"
-                                                    name="lastname" id="lastname" value="{{ $user->lastname }}"
-                                                    aria-describedby="lastnamehelp" required>
-                                                @error('lastname')
-                                                    <label id="lastname-error" class="error text-danger"
-                                                        for="lastname">{{ $message }}</label>
-                                                @enderror
-                                                <div id="lastnamehelp" class="form-text">
-                                                </div>
-                                            </div>
 
-                                            <div class="mb-3 col-12">
-                                                <label for="exampleInputEmail1" class="form-label">User ID</label>
-                                                <input type="text"
-                                                    class="form-control @error('lastname') is-invalid @enderror"
-                                                    name="custom_userid" id="lastname" value="{{ $user->custom_userid }}"
-                                                    aria-describedby="lastnamehelp" required>
-                                                @error('lastname')
-                                                    <label id="lastname-error" class="error text-danger"
-                                                        for="lastname">{{ $message }}</label>
-                                                @enderror
-                                                <div id="lastnamehelp" class="form-text">
-                                                </div>
-                                            </div>
-                                            
-                                            </div>
-                                            
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -104,91 +105,92 @@
                                     <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
                                         <div class="accordion-body">
                                             <div class="row">
-                                            <div class="mb-3 col-6">
-                                                <label for="exampleInputEmail1" class="form-label">Email</label>
-                                                <input type="text"
-                                                    class="form-control @error('email') is-invalid @enderror"
-                                                    id="email" name="email" aria-describedby="namehelp"
-                                                    value="{{ $user->email }}" required>
-                                                @error('email')
-                                                    <label id="email-error" class="error text-danger"
-                                                        for="email">{{ $message }}</label>
-                                                @enderror
-                                                <div id="namehelp" class="form-text">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-3 col-6">
-                                                <label for="exampleInputEmail1"
-                                                    class="form-label @error('mobile_no') is-invalid @enderror">Mobile
-                                                    No</label>
-                                                <input type="text" class="form-control" id="name"
-                                                    value="{{ $user->mobile_no }}" name="mobile_no"
-                                                    aria-describedby="namehelp" required>
-                                                @error('mobile_no')
-                                                    <label id="mobile_no-error" class="error text-danger"
-                                                        for="mobile_no">{{ $message }}</label>
-                                                @enderror
-                                                <div id="namehelp" class="form-text">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-3 col-12">
-                                                <label for="exampleInputEmail1"
-                                                    class="form-label @error('department') is-invalid @enderror">Status</label>
-                                                <select name="status" id="" class="form-select" required>
-                                                    <option value="">Select Status</option>
-                                                    <option selected value="1">Active</option>
-                                                    <option value="0">Inactive</option>
-                                                </select>
-                                                @error('group_id')
-                                                    <label id="group_id-error" class="error text-danger"
-                                                        for="group_id">{{ $message }}</label>
-                                                @enderror
-                                                <div id="namehelp" class="form-text">
-                                                </div>
-                                            </div>
-
-
-                                            <!--<div class="mb-3 col-6">-->
-
-                                                
-                                                    <div class="mb-3 col-6">
-                                                        <label for="exampleInputEmail1"
-                                                            class="form-label @error('password') is-invalid @enderror">Password</label>
-                                                        <input type="password" class="form-control" id="name"
-                                                            name="password" aria-describedby="namehelp">
-                                                        @error('password')
-                                                            <label id="password-error" class="error text-danger"
-                                                                for="password">{{ $message }}</label>
-                                                        @enderror
-                                                        <div id="namehelp" class="form-text">
-                                                        </div>
+                                                <div class="mb-3 col-6">
+                                                    <label for="exampleInputEmail1" class="form-label">Email</label>
+                                                    <input type="text"
+                                                        class="form-control @error('email') is-invalid @enderror"
+                                                        id="email" name="email" aria-describedby="namehelp"
+                                                        value="{{ $user->email }}" required>
+                                                    @error('email')
+                                                        <label id="email-error" class="error text-danger"
+                                                            for="email">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="namehelp" class="form-text">
                                                     </div>
+                                                </div>
 
-                                                    <div class="mb-3 col-6">
-                                                        <label for="exampleInputEmail1"
-                                                            class="form-label @error('password_confirmation') is-invalid @enderror">Re-Password</label>
-                                                        <input type="password" class="form-control" id="name"
-                                                            name="password_confirmation" aria-describedby="namehelp">
-                                                        @error('password_confirmation')
-                                                            <label id="password_confirmation-error" class="error text-danger"
-                                                                for="password_confirmation">{{ $message }}</label>
-                                                        @enderror
-                                                        <div id="namehelp" class="form-text">
-                                                        </div>
+                                                <div class="mb-3 col-6">
+                                                    <label for="exampleInputEmail1"
+                                                        class="form-label @error('mobile_no') is-invalid @enderror">Mobile
+                                                        No</label>
+                                                    <input type="text" class="form-control" id="name"
+                                                        value="{{ $user->mobile_no }}" name="mobile_no"
+                                                        aria-describedby="namehelp" required>
+                                                    @error('mobile_no')
+                                                        <label id="mobile_no-error" class="error text-danger"
+                                                            for="mobile_no">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="namehelp" class="form-text">
                                                     </div>
-                                                
+                                                </div>
 
-                                            <!--</div>-->
+                                                <div class="mb-3 col-12">
+                                                    <label for="exampleInputEmail1"
+                                                        class="form-label @error('department') is-invalid @enderror">Status</label>
+                                                    <select name="status" id="" class="form-select" required>
+                                                        <option value="">Select Status</option>
+                                                        <option selected value="1">Active</option>
+                                                        <option value="0">Inactive</option>
+                                                    </select>
+                                                    @error('group_id')
+                                                        <label id="group_id-error" class="error text-danger"
+                                                            for="group_id">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="namehelp" class="form-text">
+                                                    </div>
+                                                </div>
 
-                                            <div class="col-md-12 mb-2">
-                                                <label for="remarks" class="form-label"> SHHkey/Token/Certificate </label>
-                                                <textarea name="remarks" id="" cols="30" rows="4" class="form-control">
+
+                                                <!--<div class="mb-3 col-6">-->
+
+
+                                                <div class="mb-3 col-6">
+                                                    <label for="exampleInputEmail1"
+                                                        class="form-label @error('password') is-invalid @enderror">Password</label>
+                                                    <input type="password" class="form-control" id="name"
+                                                        name="password" aria-describedby="namehelp">
+                                                    @error('password')
+                                                        <label id="password-error" class="error text-danger"
+                                                            for="password">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="namehelp" class="form-text">
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3 col-6">
+                                                    <label for="exampleInputEmail1"
+                                                        class="form-label @error('password_confirmation') is-invalid @enderror">Re-Password</label>
+                                                    <input type="password" class="form-control" id="name"
+                                                        name="password_confirmation" aria-describedby="namehelp">
+                                                    @error('password_confirmation')
+                                                        <label id="password_confirmation-error" class="error text-danger"
+                                                            for="password_confirmation">{{ $message }}</label>
+                                                    @enderror
+                                                    <div id="namehelp" class="form-text">
+                                                    </div>
+                                                </div>
+
+
+                                                <!--</div>-->
+
+                                                <div class="col-md-12 mb-2">
+                                                    <label for="remarks" class="form-label"> SHHkey/Token/Certificate
+                                                    </label>
+                                                    <textarea name="remarks" id="" cols="30" rows="4" class="form-control">
                                                     {{ $user->remarks }}
                                                 </textarea>
+                                                </div>
                                             </div>
-                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -201,7 +203,7 @@
                             aria-labelledby="pills-profile-tab" tabindex="0">
 
                             <div class="accordion" id="accordionExample">
-                                @if ($usergroups != null)
+                                @if ($selectedgroups != null)
                                     <div class="table-responsive">
                                         <table class="table text-start align-middle table-bordered table-hover mb-0">
                                             <thead>
@@ -216,7 +218,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($groups as $item)
+                                                @foreach ($selectedgroups as $item)
                                                     <tr>
                                                         <td>
                                                             <a
@@ -229,25 +231,10 @@
                                                                 InActive
                                                             @endif
                                                         </td>
-                                                        @php
-                                                            if ($item->created_by) {
-                                                                $create = App\Models\User::find($item->created_by);
-                                                                $created_by = $create->name;
-                                                            } else {
-                                                                $created_by = 'none';
-                                                            }
-                                                        @endphp
-                                                        <td>{{ $created_by }}</td>
 
-                                                        @php
-                                                            if ($item->updated_by) {
-                                                                $update = App\Models\User::find($item->updated_by);
-                                                                $updated_by = $update->name;
-                                                            } else {
-                                                                $updated_by = 'none';
-                                                            }
-                                                        @endphp
-                                                        <td>{{ $updated_by }}</td>
+                                                        <td>{{ $item->groupcreatedby->name ?? "none" }}</td>
+
+                                                        <td>{{ $item->groupupdatedby->name ?? "none" }}</td>
 
                                                         <td>{{ $item->created_at == true ? $item->created_at->toDateString() : '' }}
                                                         </td>
@@ -290,7 +277,8 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="mb-3 text-start">
-                                                                <label for="filter" class="form-label">Groups&nbsp;</label><input
+                                                                <label for="filter"
+                                                                    class="form-label">Groups&nbsp;</label><input
                                                                     id="filter" type="text"
                                                                     class="filter form-control"
                                                                     placeholder="Search Groups">
@@ -300,15 +288,17 @@
                                                                     style="max-height: 10%; overflow:auto;">
                                                                     @foreach ($groups as $item)
                                                                         {{-- {{dd($user)}} --}}
-                                                                        @if ($user->groupids != null && in_array($item->id, json_decode($user->groupids)))
-                                                                            <span><input class="talents_id md-checkbox form-check float-start mx-1"
+                                                                        @if (in_array($item->id, $usergroupsids))
+                                                                            <span><input
+                                                                                    class="talents_id md-checkbox form-check float-start mx-1"
                                                                                     onchange="dragdrop(this.value, this.id, 'groupids[]');"
                                                                                     type="checkbox"
                                                                                     id="{{ $item->name }}"
                                                                                     value="{{ $item->id }}"
                                                                                     checked>{{ $item->name . ' ' . $item->lastname }}</span><br>
                                                                         @else
-                                                                            <span><input class="talents_id md-checkbox form-check float-start mx-1"
+                                                                            <span><input
+                                                                                    class="talents_id md-checkbox form-check float-start mx-1"
                                                                                     onchange="dragdrop(this.value, this.id, 'groupids[]');"
                                                                                     type="checkbox"
                                                                                     id="{{ $item->name }}"
@@ -322,25 +312,13 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
-                                                                <label for="users" class="form-label">Selected Groups</label>
-                                                                @php
-                                                                    $groupids = json_decode($user->groupids);
-                                                                    $groups1 = App\Models\backend\Group::find($groupids);
-                                                                    if ($groups1) {
-                                                                        # code...
-                                                                    } else {
-                                                                        # code...
-                                                                        $groups1 = [];
-                                                                    }
-                                                                    
-                                                                    // dd($groups1);
-                                                                    
-                                                                @endphp
+                                                                <label for="users" class="form-label">Selected
+                                                                    Groups</label>
                                                                 <select name="groupids[]" id=""
                                                                     class="form-control" multiple>
-                                                                    @foreach ($groups1 as $item)
+                                                                    @foreach ($selectedgroups as $item)
                                                                         <option value="{{ $item->id }}"
-                                                                            id="{{ $item->name }}">
+                                                                            id="{{ $item->name }}" selected>
                                                                             {{ $item->name }}
                                                                         </option>
                                                                     @endforeach
@@ -365,14 +343,14 @@
                         <div class="tab-pane fade" id="pills-contact" role="tabpanel"
                             aria-labelledby="pills-contact-tab" tabindex="0">
 
-                            @if ($userroles != null)
+                            @if ($selectedgroups != null)
                                 <div class="table-responsive">
                                     <table class="table text-start align-middle table-bordered table-hover mb-0">
                                         <thead>
                                             <tr class="text-dark">
                                                 <th scope="col">Name</th>
                                                 {{-- <th scope="col">Name</th> --}}
-                                                <th>Group Name</th>
+                                                {{-- <th>Group Name</th> --}}
                                                 <th scope="col">Status</th>
                                                 <th scope="col">Created By</th>
                                                 <th scope="col">Updated By</th>
@@ -382,7 +360,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($userroles as $item)
+                                            @foreach ($selectedroles as $item)
                                                 {{-- {{ dd($item) }} --}}
                                                 <tr>
                                                     <td>
@@ -392,17 +370,6 @@
                                                     </td>
 
                                                     <td>
-                                                        @php
-                                                            $groupids = json_decode($item->groupids);
-                                                            $goups = App\Models\backend\Group::find($groupids);
-                                                            
-                                                        @endphp
-                                                        @foreach ($goups as $item1)
-                                                            <span>{{ $item1->name }}</span>
-                                                        @endforeach
-
-                                                    </td>
-                                                    <td>
                                                         @if ($item->status == 1)
                                                             Active
                                                         @else
@@ -411,27 +378,12 @@
                                                     </td>
 
                                                     <td>
-                                                        @php
-                                                            if ($item->created_by) {
-                                                                $rolename = App\Models\User::find($item->created_by);
-                                                                $createdby = $rolename->name;
-                                                            } else {
-                                                                $createdby = 'none';
-                                                            }
-                                                        @endphp
-                                                        {{ $createdby }}
+
+                                                        {{ $item->rolecreatedby->name ?? "none" }}
                                                     </td>
 
                                                     <td>
-                                                        @php
-                                                            if ($item->updated_by) {
-                                                                $rolesname = App\Models\User::find($item->updated_by);
-                                                                $updatedby = $rolesname->name;
-                                                            } else {
-                                                                $updatedby = 'none';
-                                                            }
-                                                        @endphp
-                                                        {{ $updatedby }}
+                                                        {{ $item->roleupdatedby->name ?? "none"  }}
                                                     </td>
                                                     <td>{{ $item->created_at == true ? $item->created_at->toDateString() : '' }}
                                                     </td>
@@ -477,7 +429,8 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="mb-3 text-start">
-                                                                <label for="filter" class="form-label">Role&nbsp;</label><input
+                                                                <label for="filter"
+                                                                    class="form-label">Role&nbsp;</label><input
                                                                     id="filter" type="text"
                                                                     class="filter form-control"
                                                                     placeholder="Search Roles">
@@ -486,15 +439,17 @@
                                                                 <div id="mdi"
                                                                     style="max-height: 10%; overflow:auto;">
                                                                     @foreach ($roles as $item)
-                                                                        @if ($user->roleids != null && in_array($item->id, json_decode($user->roleids)))
-                                                                            <span><input class="talents_id md-checkbox form-check float-start mx-1"
+                                                                        @if (in_array($item->id, $userrolesids))
+                                                                            <span><input
+                                                                                    class="talents_id md-checkbox form-check float-start mx-1"
                                                                                     onchange="dragdrop(this.value, this.id, 'roleids[]');"
                                                                                     type="checkbox"
                                                                                     id="{{ $item->name }}"
                                                                                     value="{{ $item->id }}"
                                                                                     checked>{{ $item->name }}</span><br>
                                                                         @else
-                                                                            <span><input class="talents_id md-checkbox form-check float-start mx-1"
+                                                                            <span><input
+                                                                                    class="talents_id md-checkbox form-check float-start mx-1"
                                                                                     onchange="dragdrop(this.value, this.id, 'roleids[]');"
                                                                                     type="checkbox"
                                                                                     id="{{ $item->name }}"
@@ -508,30 +463,18 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
-                                                                <label for="users" class="form-label">Selected Groups</label>
-                                                                @php
-                                                                $roleids = json_decode($user->roleids);
-                                                                $roles1 = App\Models\backend\Role::find($roleids);
-                                                                // dd($roles1);
-                                                                if ($roles1) {
-                                                                    # code...
-                                                                } else {
-                                                                    # code...
-                                                                    $roles1 = [];
-                                                                }
-                                                                
-                                                                // dd($groups1);
-                                                                
-                                                            @endphp
-                                                            <select name="roleids[]" id=""
-                                                                class="form-control" multiple>
-                                                                @foreach ($roles1 as $item)
-                                                                    <option value="{{ $item->id }}"
-                                                                        id="{{ $item->name }}">
-                                                                        {{ $item->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
+                                                                <label for="users" class="form-label">Selected
+                                                                    Roles</label>
+
+                                                                <select name="roleids[]" id=""
+                                                                    class="form-control" multiple>
+                                                                    @foreach ($selectedroles as $item)
+                                                                        <option value="{{ $item->id }}"
+                                                                            id="{{ $item->name }}" selected>
+                                                                            {{ $item->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>

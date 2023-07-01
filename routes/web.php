@@ -8,6 +8,8 @@ use App\Http\Controllers\backend\GroupController;
 use App\Http\Controllers\backend\UserController;
 use App\Http\Controllers\backend\FieldController;
 use App\Http\Controllers\backend\RoleController;
+use App\Http\Controllers\backend\DashboardController;
+use App\Http\Controllers\backend\ReportController;
 use App\Http\Controllers\backend\MultipleroleController;
 use App\Http\Controllers\backend\UserApplicationController;
 use App\Http\Controllers\backend\ImportController;
@@ -44,6 +46,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('audits', AuditController::class);
     Route::resource('users', UserController::class);
     Route::resource('application', ApplicationController::class);
+    Route::resource('dashboard', DashboardController::class);
+    Route::resource('report', ReportController::class);
     Route::resource('group', GroupController::class);
     Route::resource('field', FieldController::class);
     Route::resource('notifications', NotificationController::class);
@@ -65,6 +69,15 @@ Route::group(['middleware' => 'auth'], function () {
 
     //toggle btn roles 
     Route::post('togglebtnroles', [AjaxController::class, 'togglebtnroles'])->name('togglebtnroles');
+
+    //routesfor chart, 
+    Route::post('chart/result', [ReportController::class, 'chart_result'])->name('chart.result');
+    Route::get('chart/result', [ReportController::class, 'chart_result_show'])->name('chart.result');
+
+    Route::post('filter/result', [ReportController::class, 'filter_result'])->name('filter.result');
+    
+    Route::post('sorting/result', [ReportController::class, 'sorting_result'])->name('sorting.result');
+    Route::get('chart', [HomeController::class, 'chart'])->name('chart');
 
 });
 

@@ -87,7 +87,7 @@
                                                         <label for="filter" class="form-label">Users&nbsp;</label><input
                                                             id="filter" type="text"
                                                             class="filter form-control"
-                                                            placeholder="Search Groups">
+                                                            placeholder="Search Users">
                                                         <br />
 
                                                         <div id="mdi"
